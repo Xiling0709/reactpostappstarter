@@ -27,6 +27,18 @@ const useStyles = createStyles((theme) => ({
     fontWeight: 700,
     textTransform: "uppercase",
   },
+
+  author: {
+    color: theme.white,
+    opacity: 0.7,
+    fontWeight: 700,
+    textTransform: "uppercase",
+  },
+  content: {
+    color: theme.white,
+    opacity: 0.7,
+    fontWeight: 400,
+  },
 }));
 
 export function ArticleCardImage({ title, category, image, id }) {

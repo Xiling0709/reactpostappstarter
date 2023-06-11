@@ -6,6 +6,8 @@ export default ({ children }) => {
     key: "mantine-color-scheme",
     defaultValue: "light",
     getInitialValueInEffect: true,
+    // mainBackground:"grey"
+    
   });
 
   useHotkeys([["mod+J", () => toggleColorScheme()]]);

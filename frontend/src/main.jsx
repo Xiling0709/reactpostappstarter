@@ -10,3 +10,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <App />
   </Auth>
 );
+
+// like Auth. the <App> is wrapped in the Auth
+// const showText = ({children}) => {
+//   return <p>{children}</p>
+
+// }
+
+// {/* <showTextNicely text = "some message" /> */}
+
+// <showTextNicely>
+//   some message
+// </showTextNicely>
