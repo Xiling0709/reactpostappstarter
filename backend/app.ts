@@ -9,6 +9,8 @@ import {
   addPost,
   posts,
   sleep,
+  users,
+ 
 } from "./fakedb";
 
 const port = 8085;
@@ -30,6 +32,7 @@ app.post("/api/user/login", (req, res) => {
   }
 });
 
+
 app.post("/api/user/validation", (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -47,12 +50,49 @@ app.get("/api/posts", async (req, res) => {
   res.json(posts);
 });
 
-// ⭐️ TODO: Implement this yourself
 app.get("/api/posts/:id", (req, res) => {
-  const id = req.params.id;
-  // The line below should be fixed.
-  res.json(posts[0]);
+  const id = parseInt(req.params.id);
+  const post = posts.find(post => post.id === id);
+  
+  if (post) {
+    const user = users.find(user => user.id === post.userId);
+    if (user) {
+      post.userEmail = user.email;
+      res.json(post);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } else {
+    res.status(404).json({ error: 'Post not found' });
+  }
 });
+
+
+app.put("/api/posts/:id", (req, res) => {
+  const postId = Number(req.params.id);
+  const updatedPost = req.body;
+
+  // Check if the post exists
+  const postIndex = posts.findIndex(post => post.id == postId);
+  if (postIndex === -1) {
+    return res.status(404).json({ error: 'Post not found.' });
+  }
+
+  // Check if the user is the author of the post
+  const authHeader = req.headers.authorization;
+  const token = parseToken(authHeader, res);
+  const decoded = jwt.verify(token, "secret");
+  const user = findUserById((decoded as IDecodedUser).id);
+  
+  if (posts[postIndex].userId !== user.id) {
+    return res.status(403).json({ error: 'User is not the author of this post.' });
+  }
+
+  
+  posts[postIndex] = { ...posts[postIndex], ...updatedPost };
+  res.status(200).json(posts[postIndex]);
+});
+
 
 /**
  * Problems with this:
@@ -66,7 +106,26 @@ app.get("/api/posts/:id", (req, res) => {
  */
 app.post("/api/posts", (req, res) => {
   const incomingPost = req.body;
-  addPost(incomingPost);
+  const authHeader = req.headers.authorization;
+  const token = parseToken(authHeader, res);
+  
+  if (!token) {
+    return res.status(403).json({ error: 'No token provided.' });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, "secret");
+  } catch (e) {
+    return res.status(403).json({ error: 'Failed to authenticate token.' });
+  }
+
+  const user = findUserById((decoded as IDecodedUser).id);
+  if (!user) {
+    return res.status(403).json({ error: 'User not found.' });
+  }
+
+  addPost(incomingPost, user.id);
   res.status(200).json({ success: true });
 });
 

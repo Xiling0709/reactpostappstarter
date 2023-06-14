@@ -4,12 +4,22 @@ export interface IDecodedUser {
   id: number;
 }
 
-const users = [
+export interface Post {
+  id: number;
+  title: string;
+  category: string;
+  content: string;
+  image: string;
+  userId: number;
+  userEmail?: string; // This field is optional
+}
+
+export const users = [
   { id: 1, email: "john123@gmail.com", password: "123" },
   { id: 2, email: "sandra123@gmail.com", password: "123" },
 ];
 
-export const posts = [
+export const posts: Post[] = [
   {
     id: 1,
     title: "Bird",
@@ -31,13 +41,13 @@ export const posts = [
   },
 ];
 
-export const addPost = (post: any) => {
+export const addPost = (post: Post, userId: number) => {
   //  Issues:
   //  *     The request body contains the title, category, and image,
   //  *     but the addPost function needs to add a unique id
   //  *     and the id of the currently logged in user to the post.
-  post.id = 3;
-  post.userId = 2;
+  post.id = posts.length + 1; // This will assign a unique id to each new post
+  post.userId = userId; // This is the id of the currently logged in user
   posts.push(post);
 };
 

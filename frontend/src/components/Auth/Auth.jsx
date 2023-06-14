@@ -16,7 +16,9 @@ const Auth = ({ children }) => {
     }
     if (!isAuthTokenValid(token)) return;
     setSession(token);
-    loginWithToken();
+    let user = jwtDecode(token);
+    localStorage.setItem('user', JSON.stringify(user));
+    loginWithToken(); 
   };
 
   const isAuthTokenValid = (token) => {
